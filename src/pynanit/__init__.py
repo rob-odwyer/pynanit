@@ -12,8 +12,14 @@ class NanitClient:
     _access_token: str
     _refresh_token: str
 
-    def __init__(self, session: aiohttp.ClientSession):
+    def __init__(
+        self, session: aiohttp.ClientSession, access_token: str = None, refresh_token: str = None
+    ):
         self._session = session
+        if access_token:
+            self._access_token = access_token
+        if refresh_token:
+            self._refresh_token = refresh_token
 
     async def initiate_login(self, email: str, password: str) -> str:
         async with self._session.post(
