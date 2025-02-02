@@ -7,6 +7,10 @@ class NanitAPIError(Exception):
     pass
 
 
+class NanitUnauthorizedError(NanitAPIError):
+    pass
+
+
 class NanitClient:
     _session: aiohttp.ClientSession
     _access_token: str
@@ -56,6 +60,8 @@ class NanitClient:
             },
         ) as resp:
             login_data = await resp.json()
+            if resp.status == 401:
+                raise NanitUnauthorizedError()
             if resp.status not in (200, 201):
                 raise NanitAPIError(f"Bad status code from nanit API: {resp.status}")
 
@@ -63,7 +69,7 @@ class NanitClient:
             self._refresh_token = login_data["refresh_token"]
             return self._access_token, self._refresh_token
 
-    async def refresh_session(self) -> dict:
+    async def refresh_session(self) -> tuple[str, str]:
         async with self._session.post(
             f"{API_ROOT}/tokens/refresh",
             json={
