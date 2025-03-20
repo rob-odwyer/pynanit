@@ -120,3 +120,8 @@ class NanitClient:
                 "limit": limit,
             },
         )
+
+    async def get_latest_event(self, baby_uid) -> dict:
+        return await self._get_authorized(
+            f"/babies/{baby_uid}/events/last",
+        )
